@@ -23,7 +23,7 @@ async def on_message(message):
 		await client.send_message(channel,config.ERROR)
 
 @client.command(pass_context=True)
-async def echo(ctx,*args):
+async def repeat(ctx,*args):
 	try:
 		author=ctx.message.author
 		if author.id==config.MASTER:
