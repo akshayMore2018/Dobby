@@ -1,9 +1,22 @@
 import discord
 from discord.ext import commands
+import asyncio
+from itertools import cycle
 import random
 import config
 
 client = commands.Bot(command_prefix='.')
+client.remove_command("help")
+
+
+#bot status
+async def change_status():
+	await client.wait_until_ready()
+	msgs=cycle(config.STATUS)
+	while not client.is_closed:
+		current_status=next(msgs)
+		await client.change_presence(game=discord.Game(name=current_status))
+		await asyncio.sleep(60)
 
 @client.event
 async def on_ready():
@@ -35,7 +48,8 @@ async def repeat(ctx,*args):
 		else:
 			await client.say("{} : {}".format(author,random.choice(config.ACCESS_DENIED)))
 	except:
-		await client.say(config.ERROR)
+		await client.say("{} , {}".format(config.ERROR,"bot went offline."))
+		await client.logout()
 
 
 @client.command(pass_context=True)
@@ -52,7 +66,24 @@ async def clear(ctx,amount=10):
 		else:
 			await client.say("{} : {}".format(author,random.choice(config.ACCESS_DENIED)))
 	except:
-		await client.say(config.ERROR)
+		await client.say("{} , {}".format(config.ERROR,"bot went offline."))
+		await client.logout()
+
+
+@client.command(pass_context=True)
+async def help(ctx):
+	try:
+		author=ctx.message.author
+		embed=discord.Embed(
+			colour=discord.Colour.orange()
+		)
+		embed.set_author(name="Help")
+		embed.add_field(name=".repeat",value="repeats the line typed",inline=False)
+		await client.send_message(author,embed=embed)
+	except:
+		await client.say("{} , {}".format(config.ERROR,"bot went offline."))
+		await client.logout()
+		
 
 @client.event
 async def on_message_delete(message):
@@ -62,6 +93,5 @@ async def on_message_delete(message):
 	#await client.send_message(channel,"{} : {}".format(author,content))
 	
 
-
+client.loop.create_task(change_status())
 client.run(config.TOKEN)
-
