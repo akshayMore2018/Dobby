@@ -1,2 +1,2 @@
 # Dobby
-The discord server bot.
+The discord server bot/elf.
